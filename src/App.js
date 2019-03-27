@@ -1,24 +1,23 @@
 import React, { Component } from 'react';
 import './App.css';
 
- const list = [
-   {
-     title: 'React',
-     url: 'https://reactjs.org/',
-     author: 'Jordan Walke',
-     num_comments: 3,
-     points: 4,
-     objectID: 0,
-   },
-   {
-     title: 'Redux',
-     url: 'https://redux.js.org/',
-     author: 'Dan Abramov, Andrew Clark',
-     num_comments: 2,
-     points: 5,
-     objectID: 1,
-   }
- ];
+const list = [
+  {
+    title: 'React',
+    url: 'https://reactjs.org/',
+    author: 'Jordan Walke',
+    num_comments: 3,
+    points: 4,
+    objectID: 0,
+  }, {
+    title: 'Redux',
+    url: 'https://redux.js.org/',
+    author: 'Dan Abramov, Andrew Clark',
+    num_comments: 2,
+    points: 5,
+    objectID: 1,
+  }
+];
 
 const isSearched = searchTerm => item =>
     item.title.toLowerCase().includes(searchTerm.toLowerCase());
@@ -48,35 +47,76 @@ class App extends Component {
   }
 
   render() {
+    const { searchTerm, list }  = this.state;
     return (
-      <div className="App">
-        <form>
-          <input
-              type="text"
-              onChange={this.onSearchChange}
-          />
-        </form>
-        {this.state.list.filter(isSearched(this.state.searchTerm)).map(item =>
-            <div key={item.objectID}>
-              <span>
-                <a href="{item.url}">{item.title}</a>
-              </span>
-              <span>{item.author}</span>
-              <span>{item.num_comments}</span>
-              <span>{item.points}</span>
-              <span>
-                <button
-                    onClick={() => this.onDismiss(item.objectID)}
-                    type="button"
-                >
-                  Отбросить
-                </button>
-              </span>
-            </div>
-        )}
+      <div className="page">
+        <div className="interactions">
+          <Search
+              value = { searchTerm }
+              onChange = { this.onSearchChange }
+          >
+            Поиск
+          </Search>
+        </div>
+        <Table
+          list = { list }
+          pattern = { searchTerm }
+          onDismiss = { this.onDismiss }
+        />
       </div>
     );
   }
 }
 
 export default App;
+
+const Search = ({ value, onChange, children }) =>
+    <form>
+      { children } <input
+        type="text"
+        value={ value }
+        onChange={ onChange }
+    />
+    </form>;
+
+const Table = ({list, pattern, onDismiss}) =>
+    <div className="table">
+      {list.filter(isSearched(pattern)).map(item =>
+          <div key={item.objectID} className="table-row">
+              <span>
+                <a href={item.url}>{item.title}</a>
+              </span>
+            <span>{item.author}</span>
+            <span>{item.num_comments}</span>
+            <span>{item.points}</span>
+            <span>
+                <Button
+                    onClick={() => onDismiss(item.objectID)}
+                    className = "button-inline"
+                >
+                  Отбросить
+                </Button>
+                </span>
+          </div>
+      )}
+    </div>;
+
+class Button extends Component {
+  render() {
+    const {
+      onClick,
+      className = '',
+      children,
+    } = this.props;
+
+    return (
+        <button
+            onClick = { onClick }
+            className={ className }
+            type = "button"
+        >
+          { children }
+        </button>
+    );
+  }
+}
